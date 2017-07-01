@@ -4,18 +4,17 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class SingleCase<T, R> implements Case<T, R> {
+final class SingleCase<T, R> extends AbstractCase<T, R> {
 
-    private final Function<? super T, ? extends R> action;
-    private final Predicate<? super T> predicate;
+    private final Predicate<? super T> condition;
 
-    private SingleCase(Function<? super T, ? extends R> action, Predicate<? super T> predicate) {
-        this.action = action;
-        this.predicate = predicate;
+    private SingleCase(Function<? super T, ? extends R> action, Predicate<? super T> condition) {
+        super(action);
+        this.condition = condition;
     }
 
-    public static <T, R> Case<T, R> of(Function<? super T, ? extends R> action, Predicate<? super T> predicate) {
-        return new SingleCase<>(action, predicate);
+    public static <T, R> Case<T, R> of(Function<? super T, ? extends R> action, Predicate<? super T> condition) {
+        return new SingleCase<>(action, condition);
     }
 
     @Override

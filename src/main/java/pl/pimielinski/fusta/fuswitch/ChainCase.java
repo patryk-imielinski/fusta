@@ -1,19 +1,20 @@
 package pl.pimielinski.fusta.fuswitch;
 
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class ChainCase<T, R> implements Case<T, R> {
+final class ChainCase<T, R> extends AbstractCase<T, R> {
 
-    private final Set<SingleCase<T, R>> cases;
+    private final Set<Predicate<? super T>> conditions;
 
     private ChainCase(Function<? super T, ? extends R> action,
-                      Predicate<? super T> predicate,
-                      Predicate<? super T>... predicates) {
-        cases = new LinkedHashSet<>();
+                      Predicate<? super T> condition,
+                      Predicate<? super T>... conditions) {
+        super(action);
+        this.conditions = new LinkedHashSet<>();
+        this.conditions.add(condition);
+        Collections.addAll(this.conditions, conditions);
     }
 
     public static <T, R> Case<T, R> of(Function<? super T, ? extends R> action,

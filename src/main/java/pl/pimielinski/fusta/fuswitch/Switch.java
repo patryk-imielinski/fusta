@@ -23,17 +23,17 @@ public class Switch<T, R> implements SwitchStatement<T, R> {
     }
 
     @Override
-    public synchronized SwitchStatement singleCase(Function<? super T, ? extends R> action, Predicate<? super T> predicate) {
-        cases.add(SingleCase.of(action, predicate));
+    public synchronized SwitchStatement singleCase(Function<? super T, ? extends R> action, Predicate<? super T> condition) {
+        cases.add(SingleCase.of(action, condition));
         return this;
     }
 
     @SafeVarargs
     @Override
     public final synchronized SwitchStatement chainCase(Function<? super T, ? extends R> action,
-                                                        Predicate<? super T> predicate,
-                                                        Predicate<? super T>... predicates) {
-        cases.add(ChainCase.of(action, predicate, predicates));
+                                                        Predicate<? super T> firstCondition,
+                                                        Predicate<? super T>... rest) {
+        cases.add(ChainCase.of(action, firstCondition, rest));
         return this;
     }
 
