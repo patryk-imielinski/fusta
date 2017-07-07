@@ -7,8 +7,9 @@ import java.util.function.Predicate;
 
 public interface SwitchStatement<T, R> extends Statement<R> {
 
-    SwitchStatement singleCase(Function<? super T, ? extends R> action, Predicate<? super T> condition);
-    SwitchStatement chainCase(Function<? super T, ? extends R> action,
-                              Predicate<? super T> firstCondition,
-                              Predicate<? super T>... rest);
+    SwitchStatement<T, R> singleCase(Function<? super T, ? extends R> action,
+                                     Predicate<? super T> condition);
+    SwitchStatement<T, R> chainCase(Function<? super T, ? extends R> action,
+                                    Predicate<? super T> firstCondition,
+                                    Predicate<? super T>... rest);
 }

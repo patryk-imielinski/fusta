@@ -19,6 +19,11 @@ final class SingleCase<T, R> extends AbstractCase<T, R> {
 
     @Override
     public Optional<R> evaluate(T argument) {
-        return null;
+        return Optional.ofNullable(action.apply(argument));
+    }
+
+    @Override
+    public boolean matches(T argument) {
+        return condition.test(argument);
     }
 }
