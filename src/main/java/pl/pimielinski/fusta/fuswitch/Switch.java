@@ -5,8 +5,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
+/**
+ * An implementation of a switch statement.
+ *
+ * @param <T> type of an argument of this statement
+ * @param <R> type of result value of this statement
+ */
 public class Switch<T, R> implements SwitchStatement<T, R> {
 
     private final T argument;
@@ -22,24 +27,20 @@ public class Switch<T, R> implements SwitchStatement<T, R> {
         return new Switch<>(argument);
     }
 
+    @SafeVarargs
     @Override
-    public synchronized SwitchStatement<T, R> singleCase(Function<? super T, ? extends R> action,
-                                                         Predicate<? super T> condition) {
+    public final synchronized SwitchStatement<T, R> singleCase(Function<? super T, ? extends R> action,
+                                                               T firstCondition,
+                                                               T... rest) {
         Objects.requireNonNull(action, "An 'action' can not be null");
-        Objects.requireNonNull(condition, "A 'condition' can not be null");
-        cases.add(SingleCase.of(action, condition));
+        Objects.requireNonNull(firstCondition, "A 'firstCondition' can not be null");
+        cases.add(new SingleCase<>(action, firstCondition, rest));
         return this;
     }
 
-    @SafeVarargs
     @Override
-    public final synchronized SwitchStatement<T, R> chainCase(Function<? super T, ? extends R> action,
-                                                              Predicate<? super T> firstCondition,
-                                                              Predicate<? super T>... rest) {
-        Objects.requireNonNull(action, "An 'action' can not be null");
-        Objects.requireNonNull(firstCondition, "A 'firstCondition' can not be null");
-        cases.add(ChainCase.of(action, firstCondition, rest));
-        return this;
+    public final synchronized Optional<R> byDefault(Function<? super T, ? extends R> action) {
+        return singleCase(action, argument).execute();
     }
 
     @Override

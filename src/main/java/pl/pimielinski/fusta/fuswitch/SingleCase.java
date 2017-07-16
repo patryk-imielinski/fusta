@@ -1,29 +1,48 @@
 package pl.pimielinski.fusta.fuswitch;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-final class SingleCase<T, R> extends AbstractCase<T, R> {
+/**
+ * An implementation of a single case statement.
+ *
+ * @param <T> type of an argument of this case
+ * @param <R> type of result value of this case
+ */
+final class SingleCase<T, R> implements Case<T, R> {
 
-    private final Predicate<? super T> condition;
+    private final Function<? super T, ? extends R> action;
+    private final Set<T> conditions;
 
-    private SingleCase(Function<? super T, ? extends R> action, Predicate<? super T> condition) {
-        super(action);
-        this.condition = condition;
-    }
+    @SafeVarargs
+    SingleCase(Function<? super T, ? extends R> action,
+              T firstCondition,
+              T... rest) {
+        this.action = action;
+        List<T> filtered = Stream.of(rest)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-    public static <T, R> Case<T, R> of(Function<? super T, ? extends R> action, Predicate<? super T> condition) {
-        return new SingleCase<>(action, condition);
+        this.conditions = new LinkedHashSet<>();
+        this.conditions.add(firstCondition);
+        this.conditions.addAll(filtered);
     }
 
     @Override
     public Optional<R> evaluate(T argument) {
-        return Optional.ofNullable(action.apply(argument));
+        if (matches(argument)) {
+            return Optional.ofNullable(action.apply(argument));
+        }
+
+        throw new AssertionError("An 'argument' does not match condition");
     }
 
     @Override
-    public boolean matches(T argument) {
-        return condition.test(argument);
+    public boolean matches(final T argument) {
+        return conditions.stream()
+                .anyMatch(cond -> cond.equals(argument));
+
     }
 }
