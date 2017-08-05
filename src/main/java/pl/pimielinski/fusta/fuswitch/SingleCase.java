@@ -43,6 +43,5 @@ final class SingleCase<T, R> implements Case<T, R> {
     public boolean matches(final T argument) {
         return conditions.stream()
                 .anyMatch(cond -> cond.equals(argument));
-
     }
 }

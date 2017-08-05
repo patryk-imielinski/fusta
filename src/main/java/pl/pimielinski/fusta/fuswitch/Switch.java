@@ -45,12 +45,10 @@ public class Switch<T, R> implements SwitchStatement<T, R> {
 
     @Override
     public final synchronized Optional<R> execute() {
-        for (Case<T, R> aCase : cases) {
-            if (aCase.matches(argument)) {
-                return aCase.evaluate(argument);
-            }
-        }
-
-        return Optional.empty();
+        return cases.stream()
+                .filter(singleCase -> singleCase.matches(argument))
+                .findFirst()
+                .map(singleCase -> singleCase.evaluate(argument))
+                .orElse(Optional.empty());
     }
 }

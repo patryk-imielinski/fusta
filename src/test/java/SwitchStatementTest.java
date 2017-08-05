@@ -37,6 +37,45 @@ public class SwitchStatementTest {
     }
 
     @Test
+    public void test_switchStatementWithDuplicateCase() {
+
+        Animal animal = Animal.DOG;
+        SwitchStatement<Animal, String> aSwitch = Switch.of(animal);
+
+        Optional<String> result = aSwitch
+                .singleCase(arg -> "Is a doggo", Animal.DOG)
+                .singleCase(arg -> "Woof woof", Animal.DOG)
+                .singleCase(arg -> "Hoo hoo!", Animal.OWL)
+                .singleCase(arg -> "Sniff sniff", Animal.HAMSTER)
+                .byDefault(arg -> "What is " + arg + "?");
+
+        assertEquals(result.orElse("ERROR"), "Is a doggo");
+    }
+
+    @Test
+    public void test_switchStatementWithExceptionThrown() {
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("An unknown argument: ");
+
+        Animal animal = Animal.DUCK;
+        SwitchStatement<Animal, String> aSwitch = Switch.of(animal);
+
+        Optional<String> result = aSwitch
+                .singleCase(arg -> "Is a doggo", Animal.DOG)
+                .singleCase(arg -> "Bulp bulp", Animal.TURTLE, Animal.FISH, Animal.SHARK)
+                .singleCase(arg -> "Iii-haa!", Animal.HORSE)
+                .singleCase(arg -> "Hoo hoo!", Animal.OWL)
+                .singleCase(arg -> "Fly\nOn your way\nLike an eagle...", Animal.EAGLE)
+                .singleCase(arg -> "Sniff sniff", Animal.HAMSTER)
+                .byDefault(arg -> {
+                    throw new IllegalArgumentException("An unknown argument: " + arg);
+                });
+
+        fail("Unreachable code");
+    }
+
+    @Test
     public void test_switchStatementWithObject() {
 
         Point point = new Point(5, 12);
@@ -58,6 +97,8 @@ public class SwitchStatementTest {
         exception.expectMessage("An 'argument' can not be null");
 
         SwitchStatement<String, String> aSwitch = Switch.of(null);
+
+        fail("Unreachable code");
     }
 
     @Test
@@ -70,6 +111,8 @@ public class SwitchStatementTest {
 
         aSwitch
                 .singleCase(null, "action");
+
+        fail("Unreachable code");
     }
 
     @Test
@@ -82,5 +125,7 @@ public class SwitchStatementTest {
 
         aSwitch
                 .singleCase(String::toUpperCase, null);
+
+        fail("Unreachable code");
     }
 }
